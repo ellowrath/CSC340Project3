@@ -13,7 +13,7 @@ module FFT
     end
   end
 
-  def fast_fourier_transform(a)
+  def fast_fourier_transform!(a)
     # 1.
     d = 1
     j = Complex(0, 1)
@@ -21,32 +21,41 @@ module FFT
     theta = -2 * PI * d / n
     r = n / 2
     # 2.
-    (1...n - 1).each do |i|
+    i = 1
+    until i > n - 1
+      puts '2. i = ' + i.to_s
       # 2.1
       w = Math.cos(i * theta) + j * Math.sin(i * theta)
       # 2.2
-      (0...n - 1).each do |k|
+      k = 0
+      # until k == n - 1
+      until k >= n - 1
         # 2.2.1
         u = 1
         # 2.2.2
-        (0...r - 1).each do |m|
+        m = 0
+        until m >= r - 1
           t = a[k + m] - a[k + m + r]
           a[k + m] = a[k + m] + a[k + m + r]
           a[k + m + r] = t * u
           u = w * u
+          m += 1
         end
         # 2.2.3
-        k = k + 2 * r
+        k = k + (2 * r)
       end
       # 2.3
       i = 2 * i
       r = r / 2
     end
     # 3.
-    (0...n - 1).each do |i|
+    i = 0
+    until i > n - 1
+      puts '3. i = ' + i.to_s
       r = i
       k = 0
-      (1...n - 1).each do |m|
+      m = 1
+      until m >= n - 1
         k = 2 * k + (r % 2)
         r = r / 2
         m = 2 * m
@@ -56,11 +65,12 @@ module FFT
         a[i] = a[k]
         a[k] = t
       end
+      i += 1
     end
     # 4.
     if d < 0
       (0...n - 1).each do |i|
-        a[i] = a[i]/n
+        a[i] = a[i] / n
       end
     end
   end

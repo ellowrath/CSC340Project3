@@ -7,5 +7,6 @@ data = [26_160.0, 19_011.0, 18_757.0, 18_405.0, 17_888.0, 14_720.0, 14_285.0, \
 
 preprocess!(data)
 p data
-fast_fourier_transform(data)
+fast_fourier_transform!(data)
+puts ''
 p data
