@@ -23,23 +23,22 @@ module FFT
     # 2.
     i = 1
     until i > n - 1
-      puts '2. i = ' + i.to_s
       # 2.1
       w = Math.cos(i * theta) + j * Math.sin(i * theta)
       # 2.2
       k = 0
-      # until k == n - 1
       until k >= n - 1
         # 2.2.1
         u = 1
         # 2.2.2
         m = 0
-        until m >= r - 1
+        until m > r - 1
           t = a[k + m] - a[k + m + r]
           a[k + m] = a[k + m] + a[k + m + r]
           a[k + m + r] = t * u
           u = w * u
           m += 1
+          puts '2. i = ' + i.to_s + ' k = ' + k.to_s + ' m = ' + m.to_s + ' r = ' + r.to_s
         end
         # 2.2.3
         k = k + (2 * r)
