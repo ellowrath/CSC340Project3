@@ -37,6 +37,7 @@ class CommonSignals
 end
 
 cs = CommonSignals.new
+=begin
 CSV.open('odd.csv', 'w') do |csv|
   csv << cs.sum_odd_func(3)
   csv << cs.sum_odd_func(10)
@@ -47,7 +48,6 @@ CSV.open('even.csv', 'w') do |csv|
   csv << cs.sum_even_func(10)
   csv << cs.sum_even_func(50)
 end
-
 f50 = cs.sum_odd_func(50)
 g50 = cs.sum_even_func(50)
 fast_fourier_transform!(f50)
@@ -63,7 +63,7 @@ end
 CSV.open('odd_psd.csv', 'w') do |csv|
   csv << f50
 end
-
 CSV.open('even_psd.csv', 'w') do |csv|
   csv << g50
 end
+=end
