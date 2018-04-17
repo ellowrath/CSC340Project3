@@ -38,7 +38,7 @@ module FFT
           a[k + m + r] = t * u
           u = w * u
           m += 1
-          puts '2. i = ' + i.to_s + ' k = ' + k.to_s + ' m = ' + m.to_s + ' r = ' + r.to_s
+          # puts '2. i = ' + i.to_s + ' k = ' + k.to_s + ' m = ' + m.to_s + ' r = ' + r.to_s
         end
         # 2.2.3
         k = k + (2 * r)
@@ -50,7 +50,7 @@ module FFT
     # 3.
     i = 0
     until i > n - 1
-      puts '3. i = ' + i.to_s
+      # puts '3. i = ' + i.to_s
       r = i
       k = 0
       m = 1
