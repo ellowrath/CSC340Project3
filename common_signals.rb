@@ -67,4 +67,10 @@ end
 CSV.open('even_psd.csv', 'w') do |csv|
   csv << g50
 end
+CSV.open('odd_limit.csv', 'w') do |csv|
+  csv << cs.sum_odd_func(512)
+end
+CSV.open('even_limit.csv', 'w') do |csv|
+  csv << cs.sum_even_func(512)
+end
 =end
