@@ -45,7 +45,7 @@ module FFT
       end
       # 2.3
       i = 2 * i
-      r = r / 2
+      r = r / 2.0
     end
     # 3.
     i = 0
