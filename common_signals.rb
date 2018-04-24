@@ -38,7 +38,7 @@ class CommonSignals
 end
 
 cs = CommonSignals.new
-=begin
+
 CSV.open('odd.csv', 'w') do |csv|
   csv << cs.sum_odd_func(3)
   csv << cs.sum_odd_func(10)
@@ -51,6 +51,8 @@ CSV.open('even.csv', 'w') do |csv|
 end
 f50 = cs.sum_odd_func(50)
 g50 = cs.sum_even_func(50)
+preprocess!(f50)
+preprocess!(g50)
 fast_fourier_transform!(f50)
 fast_fourier_transform!(g50)
 (0...f50.length).each do |i|
@@ -73,4 +75,3 @@ end
 CSV.open('even_limit.csv', 'w') do |csv|
   csv << cs.sum_even_func(512)
 end
-=end
