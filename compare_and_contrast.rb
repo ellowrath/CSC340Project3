@@ -54,8 +54,8 @@ class CompareAndContrast
   def create_psd
     @x_psd = Marshal.load(Marshal.dump(@xt))
     @y_psd = Marshal.load(Marshal.dump(@yt))
-    fast_fourier_transform!(@x_psd)
-    fast_fourier_transform!(@y_psd)
+    fast_fourier_transform!(@x_psd, 1)
+    fast_fourier_transform!(@y_psd, 1)
     (0...@x_psd.length).each do |i|
       @x_psd[i] *= @x_psd[i].conjugate
       @y_psd[i] *= @y_psd[i].conjugate

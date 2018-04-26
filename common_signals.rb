@@ -51,10 +51,8 @@ CSV.open('even.csv', 'w') do |csv|
 end
 f50 = cs.sum_odd_func(50)
 g50 = cs.sum_even_func(50)
-preprocess!(f50)
-preprocess!(g50)
-fast_fourier_transform!(f50)
-fast_fourier_transform!(g50)
+fast_fourier_transform!(f50, 1)
+fast_fourier_transform!(g50, 1)
 (0...f50.length).each do |i|
   f50[i] *= f50[i].conjugate
   f50[i] = f50[i].real

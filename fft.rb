@@ -13,9 +13,13 @@ module FFT
     end
   end
 
-  def fast_fourier_transform!(a)
+
+  # a = array, signal to be transfromed
+  # b = integer, either 1 or -1, denotes direction of transformation
+  def fast_fourier_transform!(a, b)
+    preprocess!(a)
     # 1.
-    d = 1
+    d = b
     j = Complex(0, 1)
     n = a.length
     theta = -2 * PI * d / n

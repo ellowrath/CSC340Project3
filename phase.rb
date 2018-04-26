@@ -35,7 +35,7 @@ class Phase
   def make_psds
     (0...@psds.length).each do |i|
       @psds[i] = Marshal.load(Marshal.dump(@pulses[i]))
-      fast_fourier_transform!(@psds[i])
+      fast_fourier_transform!(@psds[i], 1)
       (0...@psds[i].length).each do |j|
         @psds[i][j] *= @psds[i][j].conjugate
         @psds[i][j] = @psds[i][j].real
@@ -54,7 +54,7 @@ class Phase
     end
     (0...@bi_dft.length).each do |i|
       @bi_dft[i] = Marshal.load(Marshal.dump(@bi_tones[i]))
-      fast_fourier_transform!(@bi_dft[i])
+      fast_fourier_transform!(@bi_dft[i], 1)
     end
   end
 
@@ -74,7 +74,7 @@ class Phase
   def make_bii_psds
     (0...@bii_psds.length).each do |i|
       @bii_psds[i] = Marshal.load(Marshal.dump(@bii_tones[i]))
-      fast_fourier_transform!(@bii_psds[i])
+      fast_fourier_transform!(@bii_psds[i], 1)
       (0...@bii_psds[i].length).each do |j|
         @bii_psds[i][j] *= @bii_psds[i][j].conjugate
         @bii_psds[i][j] = @bii_psds[i][j].real
