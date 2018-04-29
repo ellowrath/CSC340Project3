@@ -16,14 +16,15 @@ module FFT
 
   # a = array, signal to be transfromed
   # b = integer, either 1 or -1, denotes direction of transformation
+  # operates on the array
   def fast_fourier_transform!(a, b)
     preprocess!(a)
     # 1.
-    d = b
+    direction = b
     j = Complex(0, 1)
     n = a.length
-    theta = -2 * PI * d / n
-    r = n / 2
+    theta = -2 * PI * direction / n
+    r = n / 2.0
     # 2.
     i = 1
     until i > n - 1
@@ -71,8 +72,9 @@ module FFT
       i += 1
     end
     # 4.
-    if d < 0
-      (0...n - 1).each do |i|
+    if direction < 0
+      # (0...n - 1).each do |i|
+      (0...n).each do |i|
         a[i] = a[i] / n
       end
     end
