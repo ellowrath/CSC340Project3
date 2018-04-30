@@ -13,6 +13,14 @@ module FFT
     end
   end
 
+  def transpose(a)
+    nr = a[0].length
+    nc = a.length
+    t = a.flatten
+    b = Array.new(nr) { Array.new (nc) }
+    (0...nc).each { |c| (0...nr).each { |r| b[r][c] = t.shift } }
+    b
+  end
 
   # a = array, signal to be transfromed
   # b = integer, either 1 or -1, denotes direction of transformation
@@ -78,5 +86,22 @@ module FFT
         a[i] = a[i] / n
       end
     end
+  end
+
+  # a = array, signal to be transfromed
+  # b = integer, either 1 or -1, denotes direction of transformation
+  # DOES NOT OPERATE ON THE ARRAY LIKE 1DFFT
+  # returns a 2d array
+  def two_d_fft!(a, b)
+    c = Marshal.load(Marshal.dump(a))
+    # c_transpose = Array.new(c.length) { Array.new(c[0].length) }
+    (0...c.length).each do |i|
+      fast_fourier_transform!(c[i], b)
+    end
+    c_transpose = transpose(c)
+    (0...c_transpose.length).each do |i|
+      fast_fourier_transform!(c_transpose[i], b)
+    end
+    transpose(c_transpose)
   end
 end
