@@ -5,8 +5,8 @@ require 'vips'
 class TwoDimensionalFFT
   include(Math)
   include(FFT)
-  attr_reader :width, :height, :test_signal, :test_pulse, :image, :c_data,\
-              :pos_inf, :neg_inf, :log_c_data
+  attr_reader :width, :height, :test_signal, :test_pulse, :c_data,\
+              :pos_inf, :neg_inf
 
   def initialize
     @width = 512
@@ -16,10 +16,7 @@ class TwoDimensionalFFT
     create_test_signal
     create_test_pulse
     @c_data = two_dimensional_correlate(@test_signal, @test_pulse)
-    scale(@c_data)
-    render(@c_data, 'c_data.jpg')
-    render(@log_c_data, 'log_c_data.jpg')
-
+    post
   end
 
   def create_test_signal
@@ -35,7 +32,7 @@ class TwoDimensionalFFT
         @test_signal[r][c] = 0
       end
     end
-    render(@test_signal, 'test_signal.jpg')
+    render(@test_signal, [1, 1, 1], 'test_signal.jpg')
   end
 
   def create_test_pulse
@@ -50,12 +47,13 @@ class TwoDimensionalFFT
         @test_pulse[r][c] = 0
       end
     end
-    render(@test_pulse, 'test_pulse.jpg')
+    render(@test_pulse, [1, 1, 1], 'test_pulse.jpg')
   end
 
-  def render(a, fn)
-    @image = Vips::Image.new_from_array a
-    @image.write_to_file(fn)
+  def render(a, b, fn)
+    image = Vips::Image.new_from_array(a)
+    image *= b
+    image.write_to_file(fn)
   end
 
   def two_dimensional_correlate(a, b)
@@ -78,27 +76,43 @@ class TwoDimensionalFFT
     c3
   end
 
-  def scale(a)
+  def post
     max = @neg_inf
     min = @pos_inf
-    (0...a.length).each do |r|
-      (0...a[0].length).each do |c|
-        max = a[r][c] if a[r][c] > max
-        min = a[r][c] if a[r][c] < min
+    lin_c_data = Marshal.load(Marshal.dump(@c_data))
+    log_c_data = Marshal.load(Marshal.dump(@c_data))
+    red_c_data = Marshal.load(Marshal.dump(@c_data))
+    # linear scaling
+    (0...lin_c_data.length).each do |r|
+      (0...lin_c_data[0].length).each do |c|
+        max = lin_c_data[r][c] if lin_c_data[r][c] > max
+        min = lin_c_data[r][c] if lin_c_data[r][c] < min
       end
     end
     dif = max - min
-    (0...a.length).each do |r|
-      (0...a[0].length).each do |c|
-        a[r][c] = (a[r][c] - min)*(255.0/dif)
+    (0...lin_c_data.length).each do |r|
+      (0...lin_c_data[0].length).each do |c|
+        lin_c_data[r][c] = (lin_c_data[r][c] - min) * (255.0 / dif)
       end
     end
-    @log_c_data = Marshal.load(Marshal.dump(a))
-    (0...@log_c_data.length).each do |r|
-      (0...@log_c_data[0].length).each do |c|
-        @log_c_data[r][c] = log(@log_c_data[r][c] + 1)
+    # log scaling
+    log_max = log(max + 1)
+    log_min = log(min + 1)
+    log_dif = log_max - log_min
+    (0...log_c_data.length).each do |r|
+      (0...log_c_data[0].length).each do |c|
+        log_c_data[r][c] = (log(log_c_data[r][c] + 1) - log_min) * (255.0 / log_dif)
       end
     end
+    # red
+    (0...red_c_data.length).each do |r|
+      (0...red_c_data[0].length).each do |c|
+        red_c_data[r][c] = 0 if red_c_data[r][c] < 0.9 * max
+      end
+    end
+    render(lin_c_data, [1, 1, 1], 'lin_c_data.jpg')
+    render(log_c_data, [1, 1, 1], 'log_c_data.jpg')
+    render(red_c_data, [2, -0.5, -0.5], 'red_c_data.jpg')
   end
 
   def dump_2_csv(a, fn)
@@ -107,9 +121,7 @@ class TwoDimensionalFFT
         csv << a[i]
       end
     end
-
   end
-
 end
 
 my_2dFFT = TwoDimensionalFFT.new
