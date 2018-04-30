@@ -73,3 +73,21 @@ end
 CSV.open('even_limit.csv', 'w') do |csv|
   csv << cs.sum_even_func(512)
 end
+f512 = cs.sum_odd_func(512)
+g512 = cs.sum_even_func(512)
+fast_fourier_transform!(f512, 1)
+fast_fourier_transform!(g512, 1)
+(0...f512.length).each do |i|
+  f512[i] *= f512[i].conjugate
+  f512[i] = f512[i].real
+end
+(0...g512.length).each do |i|
+  g512[i] *= g512[i].conjugate
+  g512[i] = g512[i].real
+end
+CSV.open('odd_limit_psd.csv', 'w') do |csv|
+  csv << f512
+end
+CSV.open('even_limit_psd.csv', 'w') do |csv|
+  csv << g512
+end

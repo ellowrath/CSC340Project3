@@ -5,15 +5,15 @@ require 'complex'
 class Phase
   include(Math)
   include(FFT)
-  attr_reader :n, :twenty_pi, :pulses, :pulse_psds, :bi_tones, :bii_tones, :phases, :bi_dft, :bii_psds
+  attr_reader :n, :twenty_pi, :pulses, :pulse_conj, :bi_tones, :bii_tones, :phases, :bi_dft, :bii_psds
 
   def initialize
     @n = 256.0
     @twenty_pi = 20 * PI
-    @pulses = Array.new(16)
-    @psds = Array.new(16)
-    @bi_tones = Array.new(2)
-    @bi_dft = Array.new(2)
+    @pulses = Array.new(256)
+    @pulse_conj = Array.new(256)
+    @bi_tones = Array.new(3)
+    @bi_dft = Array.new(3)
     @bii_tones = Array.new(20)
     @phases = Array.new(20)
     @bii_psds = Array.new(20)
@@ -26,31 +26,31 @@ class Phase
 
   def create_pulses
     (0...@pulses.length).each do |i|
-      j = i * 16
       @pulses[i] = Array.new(@n) { 0 }
-      @pulses[i][j] = 1
+      @pulses[i][i] = 1
     end
   end
 
   def make_psds
-    (0...@psds.length).each do |i|
-      @psds[i] = Marshal.load(Marshal.dump(@pulses[i]))
-      fast_fourier_transform!(@psds[i], 1)
-      (0...@psds[i].length).each do |j|
-        @psds[i][j] *= @psds[i][j].conjugate
-        @psds[i][j] = @psds[i][j].real
+    (0...@pulses.length).each do |i|
+      @pulse_conj[i] = Marshal.load(Marshal.dump(@pulses[i]))
+      fast_fourier_transform!(@pulse_conj[i], 1)
+      (0...@pulse_conj[i].length).each do |j|
+        @pulse_conj[i][j] = @pulse_conj[i][j].conjugate
+        @pulse_conj[i][j] = @pulse_conj[i][j].real
       end
     end
   end
 
   def make_bi_tones
     (0...@bi_tones.length).each do |i|
-      c = 0.5
+      c = 0.0
       @bi_tones[i] = Array.new(@n) { 0.0 }
       (0...@n).each do |j|
         t = j / @n
         @bi_tones[i][j] = sin(@twenty_pi * (t - c))
       end
+      c += 0.5
     end
     (0...@bi_dft.length).each do |i|
       @bi_dft[i] = Marshal.load(Marshal.dump(@bi_tones[i]))
@@ -61,7 +61,7 @@ class Phase
   def make_bii_tones
     (0...@bii_tones.length).each do |i|
       srand
-      c = rand
+      c = rand(100)
       @phases[i] = c
       @bii_tones[i] = Array.new(@n) { 0.0 }
       (0..@n).each do |j|
@@ -84,16 +84,34 @@ class Phase
 end
 
 p = Phase.new
-=begin
-CSV.open('psds.csv', 'w') do |csv|
-  (0...p.psds.length).each do |i|
-    csv << p.psds[i]
+
+CSV.open('pulses.csv', 'w') do |csv|
+  (0...p.pulses.length).each do |i|
+    csv << p.pulses[i]
   end
 end
-=end
-(0...p.bii_psds.length).each do |i|
-  puts i.to_s
-  puts p.phases[i]
-  p p.bii_psds[i]
-  puts ''
+CSV.open('pulse_conj.csv', 'w') do |csv|
+  (0...p.pulse_conj.length).each do |i|
+    csv << p.pulse_conj[i]
+  end
+end
+CSV.open('bi_tones.csv', 'w') do |csv|
+  (0...p.bi_tones.length).each do |i|
+    csv << p.bi_tones[i]
+  end
+end
+CSV.open('bi_dft.csv', 'w') do |csv|
+  (0...p.bi_dft.length).each do |i|
+    csv << p.bi_dft[i]
+  end
+end
+CSV.open('bii_tones.csv', 'w') do |csv|
+  (0...p.bii_tones.length).each do |i|
+    csv << p.bii_tones[i]
+  end
+end
+CSV.open('bii_psds.csv', 'w') do |csv|
+  (0...p.bii_psds.length).each do |i|
+    csv << p.bii_psds[i]
+  end
 end
