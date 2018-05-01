@@ -31,17 +31,17 @@ class DTMF
     fast_fourier_transform!(@tone_b, 1)
   end
 
-  def hilo(a, h)
-    hi_v = 0
-    lo_v = 0
+  def highs(a, h)
+    hi1_v = 0
+    hi2_v = 0
     (0...a.length / 2).each do |i|
-      if a[i].magnitude > hi_v
-        lo_v = hi_v
+      if a[i].magnitude > hi1_v
+        hi2_v = hi1_v
         h[:lo] = h[:hi]
-        hi_v = a[i].magnitude
+        hi1_v = a[i].magnitude
         h[:hi] = i
-      elsif a[i].magnitude >= lo_v
-        lo_v = a[i].magnitude
+      elsif a[i].magnitude >= hi2_v
+        hi2_v = a[i].magnitude
         h[:lo] = i
       end
     end
@@ -49,18 +49,21 @@ class DTMF
 
   def decode
     fft
-    hilo(@tone_a, @tone_a_s)
-    hilo(@tone_b, @tone_b_s)
+    highs(@tone_a, @tone_a_s)
+    highs(@tone_b, @tone_b_s)
     @a_hi_f = @freq * @tone_a_s[:hi] / @n
     @a_lo_f = @freq * @tone_a_s[:lo] / @n
     @b_hi_f = @freq * @tone_b_s[:hi] / @n
     @b_lo_f = @freq * @tone_b_s[:lo] / @n
   end
-
 end
 
 my_dtmf = DTMF.new
+puts 'Tone A:'
 puts my_dtmf.a_hi_f
 puts my_dtmf.a_lo_f
+puts my_dtmf.tone_a_s
+puts 'Tone B:'
 puts my_dtmf.b_hi_f
 puts my_dtmf.b_lo_f
+puts my_dtmf.tone_b_s

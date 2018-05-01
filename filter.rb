@@ -16,6 +16,7 @@ class Filter
     @hp_f_signal = high_pass(@signal)
     @bp_f_signal = band_pass(@signal)
     @ntch_f_signal = notch(@signal)
+    fixit
   end
 
   def sum_odd_func(s)
@@ -50,7 +51,7 @@ class Filter
   def low_pass(a)
     b = Marshal.load(Marshal.dump(a))
     fast_fourier_transform!(b, 1)
-    c = create_filtered_signal(b, 7, b.length - 1)
+    c = create_filtered_signal(b, 7, b.length)
     fast_fourier_transform!(c, -1)
     (0...c.length).each do |i|
       c[i] = c[i].real
@@ -62,7 +63,7 @@ class Filter
   def high_pass(a)
     b = Marshal.load(Marshal.dump(a))
     fast_fourier_transform!(b, 1)
-    c = create_filtered_signal(a, 0, 6)
+    c = create_filtered_signal(b, 0, 7)
     fast_fourier_transform!(c, -1)
     (0...c.length).each do |i|
       c[i] = c[i].real
@@ -75,20 +76,25 @@ class Filter
   def band_pass(a)
     b = Marshal.load(Marshal.dump(a))
     fast_fourier_transform!(b, 1)
-    c = create_filtered_signal(b, 0, 4)
-    d = create_filtered_signal(c, 7, c.length - 1)
-    fast_fourier_transform!(d, -1)
-    (0...d.length).each do |i|
-      d[i] = d[i].real
+    c = Array.new(b.length) { 0 }
+    (4...8).each do |i|
+      c[i] = 1
     end
-    d.pop
-    d
+    (0...b.length).each do |i|
+      b[i] *= c[i]
+    end
+    fast_fourier_transform!(b, -1)
+    (0...b.length).each do |i|
+      b[i] = b[i].real
+    end
+    b.pop
+    b
   end
 
   def notch(a)
     b = Marshal.load(Marshal.dump(a))
     fast_fourier_transform!(b, 1)
-    c = create_filtered_signal(a, 4, 7)
+    c = create_filtered_signal(b, 4, 8)
     fast_fourier_transform!(c, -1)
     (0...c.length).each do |i|
       c[i] = c[i].real
@@ -96,21 +102,33 @@ class Filter
     c.pop
     c
   end
-end
 
+  def fixit
+    a = Marshal.load(Marshal.dump(@lp_f_signal))
+    b = Marshal.load(Marshal.dump(@hp_f_signal))
+    c = Marshal.load(Marshal.dump(@bp_f_signal))
+    d = Marshal.load(Marshal.dump(@ntch_f_signal))
+    e= []
+    (0...a.length).each do |i|
+      e[i] = a[i] + b[i]
+    end
+    CSV.open('lpPLUShp.csv', 'w') do |csv|
+      csv << e
+    end
+    f= []
+    (0...c.length).each do |i|
+      f[i] = c[i] + d[i]
+    end
+    CSV.open('bpPLUSnt.csv', 'w') do |csv|
+      csv << f
+    end
+  end
+end
 my_filter = Filter.new
-CSV.open('lp_signal.csv', 'w') do |csv|
+CSV.open('signals.csv', 'w') do |csv|
+  csv << my_filter.signal
   csv << my_filter.lp_f_signal
-end
-
-CSV.open('hp_signal.csv', 'w') do |csv|
   csv << my_filter.hp_f_signal
-end
-
-CSV.open('bp_signal.csv', 'w') do |csv|
   csv << my_filter.bp_f_signal
-end
-
-CSV.open('ntch_signal.csv', 'w') do |csv|
   csv << my_filter.ntch_f_signal
 end
